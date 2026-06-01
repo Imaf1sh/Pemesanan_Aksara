@@ -7,6 +7,8 @@ use App\Modules\POS\Models\ProductModel;
 use App\Modules\POS\Models\OrderModel;
 use App\Modules\POS\Models\OrderItemModel;
 use App\Modules\POS\Models\ShiftModel;
+use App\Modules\POS\Models\ExpenseModel;
+use App\Modules\POS\Models\RawMaterialModel;
 use CodeIgniter\API\ResponseTrait;
 
 class Api extends BaseController
@@ -22,6 +24,8 @@ class Api extends BaseController
         $orderModel = new OrderModel();
         $orderItemModel = new OrderItemModel();
         $shiftModel = new ShiftModel();
+        $expenseModel = new ExpenseModel();
+        $rawMaterialModel = new RawMaterialModel();
 
         // Auth check for non-public API actions
         $isLoggedIn = session()->get('isLoggedIn');
@@ -52,6 +56,26 @@ class Api extends BaseController
                 }
                 return $this->respond($shift);
             } 
+
+            if ($action === 'expenses') {
+                $expenses = $expenseModel->orderBy('created_at', 'DESC')->findAll();
+                return $this->respond($expenses);
+            }
+
+            if ($action === 'raw_materials') {
+                // Self-healing seed if empty
+                if ($rawMaterialModel->countAllResults() === 0) {
+                    $rawMaterialModel->insertBatch([
+                        ['name' => 'Biji Kopi Gayo (Arabica)', 'stock' => 5000.00, 'unit' => 'gram'],
+                        ['name' => 'Susu UHT Full Cream', 'stock' => 10000.00, 'unit' => 'ml'],
+                        ['name' => 'Matcha Powder Premium', 'stock' => 1000.00, 'unit' => 'gram'],
+                        ['name' => 'Chocolate Powder Signature', 'stock' => 2000.00, 'unit' => 'gram'],
+                        ['name' => 'Butter (Croissant Ingredient)', 'stock' => 3000.00, 'unit' => 'gram'],
+                    ]);
+                }
+                $materials = $rawMaterialModel->orderBy('name', 'ASC')->findAll();
+                return $this->respond($materials);
+            }
             
             // Default: Fetch all orders with items
             $orders = $orderModel->orderBy('created_at', 'DESC')->findAll();
@@ -121,6 +145,48 @@ class Api extends BaseController
                 }
                 return $this->fail('No active shift found');
             } 
+
+            if ($action === 'create_expense') {
+                $amount = $input['amount'] ?? 0;
+                $description = $input['description'] ?? '';
+
+                if (empty($description) || $amount <= 0) {
+                    return $this->fail('Keterangan dan jumlah pengeluaran tidak valid.');
+                }
+
+                $expenseModel->insert([
+                    'amount'      => $amount,
+                    'description' => $description,
+                    'created_at'  => date('Y-m-d H:i:s')
+                ]);
+
+                return $this->respond(['success' => true, 'message' => 'Pengeluaran berhasil dicatat.']);
+            }
+
+            if ($action === 'update_raw_material') {
+                $id = $input['id'] ?? null;
+                $name = $input['name'] ?? '';
+                $stock = $input['stock'] ?? 0.00;
+                $unit = $input['unit'] ?? '';
+
+                if (empty($name) || empty($unit)) {
+                    return $this->fail('Nama dan satuan bahan baku wajib diisi.');
+                }
+
+                $data = [
+                    'name'  => $name,
+                    'stock' => $stock,
+                    'unit'  => $unit
+                ];
+
+                if ($id) {
+                    $rawMaterialModel->update($id, $data);
+                } else {
+                    $rawMaterialModel->insert($data);
+                }
+
+                return $this->respond(['success' => true, 'message' => 'Bahan baku berhasil disimpan.']);
+            }
             
             // Create a new order
             $orderId = uniqid('ord_');

@@ -25,6 +25,7 @@ let shiftData = {
 // Initialize
 window.onload = () => {
     checkShiftStatus();
+    loadExpensesSummary();
     updateTopBarClock();
     setInterval(updateTopBarClock, 1000);
     
@@ -1173,7 +1174,7 @@ const suiteMenus = {
         { name: "Penyesuaian Stok", icon: "arrows-rotate", color: "#3498db", click: "alert('Fitur penyesuaian stok & opname.')" },
         { name: "Supplier Logistik", icon: "truck", color: "#8b5a2b", click: "alert('Daftar pemasok logistik toko.')" },
         { name: "Pembelian PO", icon: "shopping-basket", color: "#64748b", click: "alert('PO pembelian stok ke supplier center.')" },
-        { name: "Pengeluaran Kas", icon: "arrow-trend-down", color: "#ef4444", click: "alert('Catat pengeluaran kas operasional.')" },
+        { name: "Pengeluaran Kas", icon: "arrow-trend-down", color: "#ef4444", click: "openExpensesModal()" },
         { name: "Riwayat & Void", icon: "history", color: "#5dade2", click: "openRiwayatModal()" },
         { name: "Laporan Omset", icon: "chart-column", color: "#a855f7", click: "openShiftDetailsModal()" },
         { name: "Absensi", icon: "camera", color: "#e040fb", click: "openAbsensiModal()" }
@@ -1183,9 +1184,9 @@ const suiteMenus = {
         { name: "Meja Terisi", icon: "chair", color: "#e67e22", click: "openFnbSuiteModal('tables')" },
         { name: "Pesanan Aktif", icon: "fire", color: "#e74c3c", click: "openFnbSuiteModal('kds')" },
         { name: "Dapur (KDS)", icon: "utensils", color: "#059669", click: "openFnbSuiteModal('kds')" },
-        { name: "Bahan Baku", icon: "box-open", color: "#2ecc71", click: "alert('Resep & stok bahan baku kopi/pastri.')" },
+        { name: "Bahan Baku", icon: "box-open", color: "#2ecc71", click: "openRawMaterialsModal()" },
         { name: "Reservasi Meja", icon: "mobile-alt", color: "#0d9488", click: "openFnbSuiteModal('tables')" },
-        { name: "Pengeluaran Cafe", icon: "arrow-trend-down", color: "#ef4444", click: "alert('Catat pengeluaran kas dapur.')" },
+        { name: "Pengeluaran Cafe", icon: "arrow-trend-down", color: "#ef4444", click: "openExpensesModal()" },
         { name: "Riwayat & Void", icon: "history", color: "#5dade2", click: "openRiwayatModal()" },
         { name: "Laporan Dapur", icon: "chart-column", color: "#a855f7", click: "openShiftDetailsModal()" },
         { name: "Absensi", icon: "camera", color: "#e040fb", click: "openAbsensiModal()" }
@@ -1197,7 +1198,7 @@ const suiteMenus = {
         { name: "Proses Kering", icon: "wind", color: "#e67e22", click: "alert('Status Kering: Sedang dikeringkan.')" },
         { name: "Proses Setrika", icon: "shirt", color: "#9b59b6", click: "alert('Status Setrika: Sedang disetrika.')" },
         { name: "Siap Diambil", icon: "circle-check", color: "#2ecc71", click: "alert('Status Selesai: Siap diserahkan.')" },
-        { name: "Pengeluaran Kas", icon: "arrow-trend-down", color: "#ef4444", click: "alert('Catat pengeluaran operasional laundry.')" },
+        { name: "Pengeluaran Kas", icon: "arrow-trend-down", color: "#ef4444", click: "openExpensesModal()" },
         { name: "Riwayat & Void", icon: "history", color: "#5dade2", click: "openRiwayatModal()" },
         { name: "Laporan Laundry", icon: "chart-column", color: "#a855f7", click: "openShiftDetailsModal()" },
         { name: "Absensi", icon: "camera", color: "#e040fb", click: "openAbsensiModal()" }
@@ -2314,4 +2315,201 @@ function playKdsSound() {
     } catch (e) {
         console.log('Web Audio sound blocked/not supported: ', e);
     }
+}
+
+// ==========================================================================
+// Cafe Expenses & Raw Materials Module Logic
+// ==========================================================================
+
+function loadExpensesSummary() {
+    fetch(getApiUrl('api.php?action=expenses'))
+        .then(res => res.json())
+        .then(expenses => {
+            const now = new Date();
+            const pad = (n) => n < 10 ? '0' + n : n;
+            const todayStr = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+            
+            let totalToday = 0;
+            expenses.forEach(exp => {
+                if (exp.created_at && exp.created_at.startsWith(todayStr)) {
+                    totalToday += parseInt(exp.amount || 0);
+                }
+            });
+            
+            const el = document.getElementById('dash-expenses-total');
+            if (el) {
+                el.innerText = formatRupiah(totalToday);
+            }
+        })
+        .catch(err => console.error('Error loading expenses summary:', err));
+}
+
+function openExpensesModal() {
+    document.getElementById('pos-expenses-modal').classList.add('active');
+    loadExpensesList();
+}
+
+function closeExpensesModal() {
+    document.getElementById('pos-expenses-modal').classList.remove('active');
+    document.getElementById('expenses-form').reset();
+}
+
+function loadExpensesList() {
+    fetch(getApiUrl('api.php?action=expenses'))
+        .then(res => res.json())
+        .then(expenses => {
+            const now = new Date();
+            const pad = (n) => n < 10 ? '0' + n : n;
+            const todayStr = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+            
+            const todayExpenses = expenses.filter(exp => exp.created_at && exp.created_at.startsWith(todayStr));
+            const tbody = document.getElementById('expenses-list-body');
+            
+            if (todayExpenses.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 1rem; color: #94a3b8;">Belum ada pengeluaran hari ini.</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            todayExpenses.forEach(exp => {
+                const timeStr = exp.created_at ? exp.created_at.substring(11, 16) : '--:--';
+                const tr = document.createElement('tr');
+                tr.style.borderBottom = '1px solid #f1f5f9';
+                tr.innerHTML = `
+                    <td style="padding: 0.6rem 0.5rem; color: #64748b;">${timeStr}</td>
+                    <td style="padding: 0.6rem 0.5rem; font-weight: 500; color: #334155;">${exp.description}</td>
+                    <td style="padding: 0.6rem 0.5rem; text-align: right; font-weight: 700; color: #ef4444;">${formatRupiah(exp.amount)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        })
+        .catch(err => console.error('Error loading expenses list:', err));
+}
+
+function submitExpense(event) {
+    event.preventDefault();
+    const desc = document.getElementById('expense-desc').value.trim();
+    const amount = parseInt(document.getElementById('expense-amount').value);
+    
+    if (!desc || isNaN(amount) || amount <= 0) {
+        alert('Mohon masukkan keterangan dan jumlah pengeluaran yang valid.');
+        return;
+    }
+    
+    fetch(getApiUrl('api.php'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            action: 'create_expense',
+            description: desc,
+            amount: amount
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('Pengeluaran berhasil dicatat!');
+            document.getElementById('expenses-form').reset();
+            loadExpensesList();
+            loadExpensesSummary();
+        } else {
+            alert('Gagal menyimpan pengeluaran: ' + (data.messages?.error || 'Error server'));
+        }
+    })
+    .catch(err => console.error('Error saving expense:', err));
+}
+
+// Raw Materials CRUD Logic
+function openRawMaterialsModal() {
+    document.getElementById('pos-raw-materials-modal').classList.add('active');
+    loadRawMaterialsList();
+}
+
+function closeRawMaterialsModal() {
+    document.getElementById('pos-raw-materials-modal').classList.remove('active');
+    resetRawMaterialForm();
+}
+
+function loadRawMaterialsList() {
+    fetch(getApiUrl('api.php?action=raw_materials'))
+        .then(res => res.json())
+        .then(materials => {
+            const tbody = document.getElementById('raw-materials-list-body');
+            tbody.innerHTML = '';
+            
+            if (materials.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 1rem; color: #94a3b8;">Tidak ada bahan baku.</td></tr>`;
+                return;
+            }
+            
+            materials.forEach(mat => {
+                const tr = document.createElement('tr');
+                tr.style.borderBottom = '1px solid #f1f5f9';
+                tr.innerHTML = `
+                    <td style="padding: 0.6rem 0.5rem; font-weight: 500; color: #334155;">${mat.name}</td>
+                    <td style="padding: 0.6rem 0.5rem; text-align: right; font-weight: 700; color: #005813;">${parseFloat(mat.stock).toLocaleString('id-ID')}</td>
+                    <td style="padding: 0.6rem 0.5rem; color: #64748b;">${mat.unit}</td>
+                    <td style="padding: 0.6rem 0.5rem; text-align: center;">
+                        <button onclick="editRawMaterial(${mat.id}, '${mat.name}', ${mat.stock}, '${mat.unit}')" style="background: #3498db; border: none; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 0.75rem;">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        })
+        .catch(err => console.error('Error loading raw materials list:', err));
+}
+
+function editRawMaterial(id, name, stock, unit) {
+    document.getElementById('material-id').value = id;
+    document.getElementById('material-name').value = name;
+    document.getElementById('material-stock').value = stock;
+    document.getElementById('material-unit').value = unit;
+    
+    document.getElementById('material-btn-text').innerText = 'Update';
+    document.getElementById('btn-cancel-edit-material').style.display = 'inline-block';
+}
+
+function resetRawMaterialForm() {
+    document.getElementById('raw-material-form').reset();
+    document.getElementById('material-id').value = '';
+    document.getElementById('material-btn-text').innerText = 'Simpan';
+    document.getElementById('btn-cancel-edit-material').style.display = 'none';
+}
+
+function submitRawMaterial(event) {
+    event.preventDefault();
+    const id = document.getElementById('material-id').value;
+    const name = document.getElementById('material-name').value.trim();
+    const stock = parseFloat(document.getElementById('material-stock').value);
+    const unit = document.getElementById('material-unit').value.trim();
+    
+    if (!name || isNaN(stock) || stock < 0 || !unit) {
+        alert('Mohon lengkapi formulir bahan baku dengan nilai yang valid.');
+        return;
+    }
+    
+    fetch(getApiUrl('api.php'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            action: 'update_raw_material',
+            id: id ? parseInt(id) : null,
+            name: name,
+            stock: stock,
+            unit: unit
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert(id ? 'Bahan baku berhasil di-update!' : 'Bahan baku berhasil ditambahkan!');
+            resetRawMaterialForm();
+            loadRawMaterialsList();
+        } else {
+            alert('Gagal menyimpan bahan baku.');
+        }
+    })
+    .catch(err => console.error('Error saving raw material:', err));
 }

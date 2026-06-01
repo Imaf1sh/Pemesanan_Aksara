@@ -1347,7 +1347,7 @@ $isOwner = ($role === 'owner');
                         <div class="sum-card-icon"><i class="fas fa-arrow-trend-down"></i></div>
                         <div class="sum-card-info">
                             <span>Pengeluaran</span>
-                            <h4><?= $isKasir ? 'Rp ***' : 'Rp 0' ?></h4>
+                            <h4 id="dash-expenses-total"><?= $isKasir ? 'Rp ***' : 'Rp 0' ?></h4>
                         </div>
                     </div>
                 </div>
@@ -2169,6 +2169,120 @@ $isOwner = ($role === 'owner');
             
             <div class="modal-footer">
                 <button class="btn-primary" style="background: #f1f5f9; color: #475569; box-shadow: none;" onclick="closeFnbSuiteModal()">Tutup Simulator</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Pengeluaran Cafe -->
+    <div class="pos-modal-overlay" id="pos-expenses-modal">
+        <div class="pos-modal" style="max-width: 600px; width: 95%;">
+            <div class="modal-header">
+                <h3 style="display:flex; align-items:center; gap:0.6rem;">
+                    <i class="fas fa-arrow-trend-down" style="color: #ef4444;"></i>
+                    Catat Pengeluaran Cafe
+                </h3>
+                <i class="fas fa-times close-modal" onclick="closeExpensesModal()"></i>
+            </div>
+            <div class="modal-body" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.2rem; max-height: 70vh; overflow-y: auto;">
+                <!-- Form Tambah Pengeluaran -->
+                <form id="expenses-form" onsubmit="submitExpense(event)" style="display: flex; flex-direction: column; gap: 1rem; background: #f8fafc; padding: 1rem; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                        <label for="expense-desc" style="font-size: 0.85rem; font-weight: 600; color: #475569;">Keterangan Pengeluaran</label>
+                        <input type="text" id="expense-desc" required placeholder="Contoh: Beli Es Batu, Isi Ulang Gas..." style="padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.9rem;">
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                        <label for="expense-amount" style="font-size: 0.85rem; font-weight: 600; color: #475569;">Jumlah Uang (Rupiah)</label>
+                        <input type="number" id="expense-amount" required min="1" placeholder="Contoh: 15000" style="padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.9rem;">
+                    </div>
+                    <button type="submit" class="btn-primary" style="background: #ef4444; border: none; color: white; padding: 0.7rem; border-radius: 8px; font-weight: 700; cursor: pointer;">
+                        <i class="fas fa-plus"></i> Tambah Pengeluaran
+                    </button>
+                </form>
+
+                <!-- Daftar Pengeluaran Hari Ini -->
+                <div>
+                    <h4 style="font-size: 0.95rem; font-weight: 700; color: #1e293b; margin-bottom: 0.6rem;">Daftar Pengeluaran Hari Ini</h4>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e2e8f0; color: #64748b;">
+                                    <th style="padding: 0.5rem;">Waktu</th>
+                                    <th style="padding: 0.5rem;">Keterangan</th>
+                                    <th style="padding: 0.5rem; text-align: right;">Jumlah</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expenses-list-body">
+                                <tr>
+                                    <td colspan="3" style="text-align: center; padding: 1rem; color: #94a3b8;">Belum ada pengeluaran hari ini.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 1rem; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end;">
+                <button class="btn-primary" style="background: #f1f5f9; color: #475569; box-shadow: none; border: 1px solid #cbd5e1;" onclick="closeExpensesModal()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Bahan Baku -->
+    <div class="pos-modal-overlay" id="pos-raw-materials-modal">
+        <div class="pos-modal" style="max-width: 700px; width: 95%;">
+            <div class="modal-header">
+                <h3 style="display:flex; align-items:center; gap:0.6rem;">
+                    <i class="fas fa-box-open" style="color: #2ecc71;"></i>
+                    Persediaan Bahan Baku
+                </h3>
+                <i class="fas fa-times close-modal" onclick="closeRawMaterialsModal()"></i>
+            </div>
+            <div class="modal-body" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.2rem; max-height: 70vh; overflow-y: auto;">
+                <!-- Form Tambah/Update Bahan Baku -->
+                <form id="raw-material-form" onsubmit="submitRawMaterial(event)" style="display: flex; gap: 0.8rem; align-items: flex-end; background: #f8fafc; padding: 1rem; border-radius: 12px; border: 1px solid #e2e8f0; flex-wrap: wrap;">
+                    <input type="hidden" id="material-id">
+                    <div style="display: flex; flex-direction: column; gap: 0.4rem; flex: 1; min-width: 150px;">
+                        <label for="material-name" style="font-size: 0.8rem; font-weight: 600; color: #475569;">Nama Bahan Baku</label>
+                        <input type="text" id="material-name" required placeholder="Biji Kopi Gayo, Susu..." style="padding: 0.5rem; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.85rem;">
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.4rem; width: 100px;">
+                        <label for="material-stock" style="font-size: 0.8rem; font-weight: 600; color: #475569;">Stok</label>
+                        <input type="number" id="material-stock" required step="0.01" min="0" placeholder="5000" style="padding: 0.5rem; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.85rem;">
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.4rem; width: 100px;">
+                        <label for="material-unit" style="font-size: 0.8rem; font-weight: 600; color: #475569;">Satuan</label>
+                        <input type="text" id="material-unit" required placeholder="gram, ml, pcs" style="padding: 0.5rem; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.85rem;">
+                    </div>
+                    <button type="submit" class="btn-primary" style="background: #2ecc71; border: none; color: white; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 700; height: 36px; cursor: pointer; display: flex; align-items: center; gap: 0.3rem;">
+                        <i class="fas fa-save"></i> <span id="material-btn-text">Simpan</span>
+                    </button>
+                    <button type="button" id="btn-cancel-edit-material" onclick="resetRawMaterialForm()" style="display: none; background: #cbd5e1; border: none; color: #475569; padding: 0.5rem; border-radius: 6px; font-weight: 700; height: 36px; cursor: pointer;">
+                        Batal
+                    </button>
+                </form>
+
+                <!-- Tabel Bahan Baku -->
+                <div>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e2e8f0; color: #64748b;">
+                                    <th style="padding: 0.5rem;">Nama Bahan</th>
+                                    <th style="padding: 0.5rem; text-align: right;">Stok</th>
+                                    <th style="padding: 0.5rem;">Satuan</th>
+                                    <th style="padding: 0.5rem; text-align: center; width: 100px;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="raw-materials-list-body">
+                                <tr>
+                                    <td colspan="4" style="text-align: center; padding: 1rem; color: #94a3b8;">Memuat data bahan baku...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 1rem; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end;">
+                <button class="btn-primary" style="background: #f1f5f9; color: #475569; box-shadow: none; border: 1px solid #cbd5e1;" onclick="closeRawMaterialsModal()">Tutup</button>
             </div>
         </div>
     </div>
