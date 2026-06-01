@@ -1,0 +1,91 @@
+#========================================================================
+# OPERATING SYSTEM SPECIFIC FILES
+#========================================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+
+#========================================================================
+# COMPOSER DEPENDENCIES
+#========================================================================
+/vendor/
+/composer.lock
+
+#========================================================================
+# ENVIRONMENT CONFIGURATION (DO NOT COMMIT SENSITIVE CREDS)
+#========================================================================
+.env
+env
+
+#========================================================================
+# CODEIGNITER 4 WRITABLE / CACHE / TEMP FILES
+#========================================================================
+/writable/cache/*
+!/writable/cache/index.html
+
+/writable/logs/*
+!/writable/logs/index.html
+
+/writable/session/*
+!/writable/session/index.html
+
+/writable/uploads/*
+!/writable/uploads/index.html
+
+/writable/debugbar/*
+!/writable/debugbar/index.html
+
+php_errors.log
+
+#========================================================================
+# TESTING & COVERAGE
+#========================================================================
+/tests/coverage*
+/phpunit
+/phpunit.xml
+/results/
+
+#========================================================================
+# IDE CONFIGURATION FILES (VS CODE, PHPSTORM, NETBEANS, ETC)
+#========================================================================
+.vscode/
+.idea/
+*.iml
+/nbproject/
+/build/
+/nbbuild/
+/dist/
+/nbdist/
+/nbactions.xml
+/nb-configuration.xml
+/.nb-gradle/
+*.sublime-workspace
+*.sublime-project
+.phpintel/
+
+#========================================================================
+# BACKUP & LEGACY CODES (DO NOT COMMIT TO PRODUCTION REPO)
+#========================================================================
+/vanilla_backup/
+/legacy/
+/builds/
+/app/index.html
+/writable/index.html
