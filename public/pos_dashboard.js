@@ -1,3 +1,8 @@
+const getApiUrl = (path) => {
+    const base = (typeof BASE_URL !== 'undefined') ? BASE_URL : '';
+    return base + path;
+};
+
 let products = [];
 let cart = [];
 let currentCategory = 'all';
@@ -152,7 +157,7 @@ function updateDashboardShiftCard() {
 }
 
 function checkShiftStatus() {
-    fetch('api.php?action=shift_status')
+    fetch(getApiUrl('api.php?action=shift_status'))
         .then(res => res.json())
         .then(data => {
             if (data.status === 'open') {
@@ -185,7 +190,7 @@ function openShift() {
         return;
     }
 
-    fetch('api.php', {
+    fetch(getApiUrl('api.php'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'open_shift', initial_cash: parseFloat(initialCash) })
@@ -212,7 +217,7 @@ function openShift() {
 }
 
 function loadProducts() {
-    fetch('api.php?action=products')
+    fetch(getApiUrl('api.php?action=products'))
         .then(res => res.json())
         .then(data => {
             products = data;
@@ -268,7 +273,7 @@ function renderProducts() {
 
         card.innerHTML = `
             <div class="${badgeClass}">${product.stock <= 0 ? 'Habis' : 'Stok: ' + product.stock}</div>
-            <img src="${product.img}" alt="${product.name}">
+            <img src="${getApiUrl(product.img)}" alt="${product.name}">
             <div class="pos-product-info">
                 <h4>${product.name}</h4>
                 <div class="pos-product-price">
@@ -637,7 +642,7 @@ function processPayment() {
         order_type: orderType
     };
 
-    fetch('api.php', {
+    fetch(getApiUrl('api.php'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData)
@@ -841,7 +846,7 @@ function printReceipt() {
 function loadShiftSales() {
     if (!shiftData.open_time) return;
 
-    fetch('api.php')
+    fetch(getApiUrl('api.php'))
         .then(res => res.json())
         .then(orders => {
             let cashSales = 0;
@@ -941,7 +946,7 @@ function calculateShiftVariance() {
 function closeShift() {
     if (!confirm('Apakah Anda yakin ingin menutup shift kasir saat ini? Seluruh kas laci akan dikunci.')) return;
 
-    fetch('api.php', {
+    fetch(getApiUrl('api.php'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'close_shift' })

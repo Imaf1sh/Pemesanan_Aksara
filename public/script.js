@@ -260,7 +260,9 @@ function submitOrder(orderData) {
     checkoutBtn.disabled = true;
     checkoutBtn.innerText = 'Mengirim Pesanan...';
 
-    fetch('api.php', {
+    const apiUrl = (typeof BASE_URL !== 'undefined') ? BASE_URL + 'api.php' : 'api.php';
+
+    fetch(apiUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

@@ -17,7 +17,7 @@ $descriptions = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Aksara Coffee Shop</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="<?= base_url('style.css') ?>">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -34,7 +34,7 @@ $descriptions = [
             <p>Rasakan kopi dengan sentuhan cerita di setiap seduhannya.</p>
         </div>
         <div class="hero-image">
-            <img src="hero_coffee.png" alt="Aksara Coffee">
+            <img src="<?= base_url('hero_coffee.png') ?>" alt="Aksara Coffee">
         </div>
     </header>
 
@@ -57,7 +57,7 @@ $descriptions = [
                 <?php foreach ($coffee as $item): ?>
                     <?php $desc = $descriptions[$item['id']] ?? 'Sentuhan cita rasa khas Aksara Coffee.'; ?>
                     <div class="menu-card">
-                        <img src="<?= esc($item['img']) ?>" alt="<?= esc($item['name']) ?>" class="menu-img">
+                        <img src="<?= base_url(esc($item['img'])) ?>" alt="<?= esc($item['name']) ?>" class="menu-img">
                         <div class="menu-card-content">
                             <div class="menu-info">
                                 <h3><?= esc($item['name']) ?></h3>
@@ -82,7 +82,7 @@ $descriptions = [
                 <?php foreach ($nonCoffee as $item): ?>
                     <?php $desc = $descriptions[$item['id']] ?? 'Sentuhan cita rasa khas Aksara Coffee.'; ?>
                     <div class="menu-card">
-                        <img src="<?= esc($item['img']) ?>" alt="<?= esc($item['name']) ?>" class="menu-img">
+                        <img src="<?= base_url(esc($item['img'])) ?>" alt="<?= esc($item['name']) ?>" class="menu-img">
                         <div class="menu-card-content">
                             <div class="menu-info">
                                 <h3><?= esc($item['name']) ?></h3>
@@ -107,7 +107,7 @@ $descriptions = [
                 <?php foreach ($snack as $item): ?>
                     <?php $desc = $descriptions[$item['id']] ?? 'Sentuhan cita rasa khas Aksara Coffee.'; ?>
                     <div class="menu-card">
-                        <img src="<?= esc($item['img']) ?>" alt="<?= esc($item['name']) ?>" class="menu-img">
+                        <img src="<?= base_url(esc($item['img'])) ?>" alt="<?= esc($item['name']) ?>" class="menu-img">
                         <div class="menu-card-content">
                             <div class="menu-info">
                                 <h3><?= esc($item['name']) ?></h3>
@@ -267,6 +267,9 @@ $descriptions = [
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        const BASE_URL = '<?= base_url() ?>';
+    </script>
+    <script src="<?= base_url('script.js') ?>"></script>
 </body>
 </html>

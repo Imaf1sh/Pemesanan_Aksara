@@ -765,7 +765,7 @@
 
         // Fetch orders from API
         function fetchOrders() {
-            fetch('api.php')
+            fetch('<?= base_url('api.php') ?>')
             .then(response => response.json())
             .then(orders => {
                 currentOrders = orders;
@@ -979,7 +979,7 @@
             }
 
             setTimeout(() => {
-                fetch('api.php', {
+                fetch('<?= base_url('api.php') ?>', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'update_status', id: orderId, status: 'completed' })
@@ -1014,7 +1014,7 @@
 
         // Restore completed order back to pending state
         function restoreOrder(orderId) {
-            fetch('api.php', {
+            fetch('<?= base_url('api.php') ?>', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'update_status', id: orderId, status: 'pending' })
