@@ -69,42 +69,54 @@ Dengan struktur ini, modul dapat ditambahkan, dihapus, atau dimodifikasi tanpa m
 * Composer installed.
 * Web Server (Apache/Nginx) seperti WampServer, Laragon, atau XAMPP.
 
-### Langkah-langkah
-1. **Clone Repositori & Persiapkan Berkas**
-   ```bash
-   git clone <repository-url> pemesanan.aksara
-   cd pemesanan.aksara
-   ```
+### Langkah-langkah Menjalankan Proyek dengan WampServer
 
-2. **Instalasi Dependensi**
-   ```bash
-   composer install
-   ```
+1. **Simpan Folder Proyek di Direktori WampServer**
+   * Pindahkan atau clone folder proyek `pemesanan.aksara` ke dalam direktori root web server WampServer Anda. Biasanya berlokasi di:
+     `C:\wamp64\www\pemesanan.aksara`
 
-3. **Konfigurasi Environment**
-   * Salin file `.env.example` menjadi `.env`.
-   * Sesuaikan pengaturan URL dasar dan koneksi database MySQL:
+2. **Aktifkan WampServer & Pastikan Versi PHP Sesuai**
+   * Jalankan aplikasi WampServer di komputer Anda.
+   * Pastikan ikon WampServer di taskbar Windows menyala berwarna **Hijau** (artinya Apache, MySQL, dan MariaDB berjalan normal).
+   * Klik kiri ikon WampServer, pilih **PHP** -> **Version**, lalu centang versi **PHP 8.2.x** atau **8.3.x** (karena CodeIgniter 4 membutuhkan PHP minimal versi 8.2).
+
+3. **Instalasi Dependensi**
+   * Jalankan terminal/CMD di dalam folder `C:\wamp64\www\pemesanan.aksara`, lalu jalankan perintah:
+     ```bash
+     composer install
+     ```
+
+4. **Konfigurasi Environment (.env)**
+   * Salin berkas `env` di root proyek dan ubah namanya menjadi `.env`.
+   * Buka berkas `.env` tersebut dan sesuaikan baris berikut (sesuaikan konfigurasi URL dan Database WampServer default):
      ```env
+     # URL dasar proyek (PENTING: tambahkan /public/ di akhir)
      app.baseURL = 'http://localhost/pemesanan.aksara/public/'
      
+     # Konfigurasi koneksi database MySQL WampServer
      database.default.hostname = 'localhost'
      database.default.database = 'pemesanan_aksara'
      database.default.username = 'root'
-     database.default.password = ''
+     database.default.password = ''  # Kosongkan password (default bawaan WampServer)
      database.default.DBDriver = 'MySQLi'
      ```
 
-4. **Import Database**
-   * Buat database baru di MySQL dengan nama `pemesanan_aksara`.
-   * Import file basis data cadangan `pemesanan_aksara.sql` ke dalam database Anda.
+5. **Import Database**
+   * Buka browser Anda dan masuk ke phpMyAdmin di alamat: `http://localhost/phpmyadmin`
+   * Masuk dengan username `root` dan kosongkan password.
+   * Buat database baru bernama `pemesanan_aksara`.
+   * Klik database tersebut, buka tab **Import**, pilih file basis data [pemesanan_aksara.sql](file:///c:/wamp64/www/pemesanan.aksara/pemesanan_aksara.sql) yang berada di dalam folder proyek, lalu klik tombol **Import** (atau **Go**) di bagian bawah.
 
-5. **Jalankan Aplikasi**
-   * Arahkan konfigurasi virtual host web server Anda ke folder `/public`.
-   * Atau, Anda dapat menggunakan server bawaan PHP/CodeIgniter dengan menjalankan perintah berikut di terminal:
-     ```bash
-     php spark serve
-     ```
-   * Akses aplikasi melalui peramban di alamat `http://localhost:8080`.
+6. **Akses Website di Browser**
+   Setelah semua langkah selesai, Anda dapat langsung mengakses modul aplikasi di browser melalui URL berikut:
+   * **Halaman Depan Pelanggan (Menu Digital)**: [http://localhost/pemesanan.aksara/public/](http://localhost/pemesanan.aksara/public/)
+   * **Halaman Login POS (Kasir/Admin/Owner)**: [http://localhost/pemesanan.aksara/public/login](http://localhost/pemesanan.aksara/public/login)
+   * **Halaman Kitchen Display System (KDS)**: [http://localhost/pemesanan.aksara/public/kds](http://localhost/pemesanan.aksara/public/kds)
+
+   **Akun Demo untuk Login POS**:
+   * **Kasir**: Username: `kasir` | Password: `1234`
+   * **Admin**: Username: `admin` | Password: `1234`
+   * **Owner**: Username: `owner` | Password: `1234`
 
 ---
 
