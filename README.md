@@ -114,9 +114,9 @@ Dengan struktur ini, modul dapat ditambahkan, dihapus, atau dimodifikasi tanpa m
    * **Halaman Kitchen Display System (KDS)**: [http://localhost/pemesanan.aksara/public/kds](http://localhost/pemesanan.aksara/public/kds)
 
    **Akun Demo untuk Login POS**:
-   * **Kasir**: Username: `kasir` | Password: `1234`
-   * **Admin**: Username: `admin` | Password: `1234`
-   * **Owner**: Username: `owner` | Password: `1234`
+   * **Kasir**: Username: `kasir` | Password: `kasir123`
+   * **Admin**: Username: `admin` | Password: `admin123`
+   * **Owner**: Username: `owner` | Password: `owner123`
 
 ---
 
