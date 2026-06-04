@@ -11,6 +11,7 @@ Aplikasi ini dibagi menjadi beberapa modul utama yang saling terintegrasi:
 1. **Modul Pelanggan (Home / Customer Menu)**
    * Pemesanan mandiri oleh pelanggan dari meja secara digital.
    * Katalog menu interaktif (Signature Coffee, Non-Coffee, dan Snack).
+   * Tampilan katalog yang responsif dan optimal untuk mobile viewports (smartphone).
    * Pilihan catatan pesanan khusus (notes dapur) per item.
    * Dukungan pembayaran cash ke kasir atau pembayaran QRIS instan.
 
@@ -19,6 +20,8 @@ Aplikasi ini dibagi menjadi beberapa modul utama yang saling terintegrasi:
    * Mode Penjualan (Catalog & Cart) dengan kalkulasi diskon, PPN (11%), biaya layanan (5%), kembalian kasir, serta integrasi cetak struk mockup.
    * Manajemen shift kasir (buka shift, set modal awal, hitung kas laci akhir, dan variansi/selisih uang kas).
    * Simulasi pemindaian barcode produk secara otomatis.
+   * Manajemen Persediaan Bahan Baku (Inventory) terintegrasi database MySQL untuk pemantauan stok bahan mentah.
+   * Pencatatan Pengeluaran Operasional Cafe secara real-time langsung ke database MySQL.
    * Multi-Suite Industries (FnB, Retail, Laundry, Salon, Bengkel) dengan skema pewarnaan dinamis.
 
 3. **Modul Dapur (Kitchen Display System - KDS)**
@@ -107,7 +110,13 @@ Dengan struktur ini, modul dapat ditambahkan, dihapus, atau dimodifikasi tanpa m
    * Buat database baru bernama `pemesanan_aksara`.
    * Klik database tersebut, buka tab **Import**, pilih file basis data [pemesanan_aksara.sql](file:///c:/wamp64/www/pemesanan.aksara/pemesanan_aksara.sql) yang berada di dalam folder proyek, lalu klik tombol **Import** (atau **Go**) di bagian bawah.
 
-6. **Akses Website di Browser**
+6. **Jalankan Migrasi Database (PENTING)**
+   * Untuk memastikan semua skema tabel terbaru terbuat di database (seperti tabel `expenses` dan `raw_materials`), jalankan perintah migrasi berikut di terminal pada direktori root proyek:
+     ```bash
+     php spark migrate
+     ```
+
+7. **Akses Website di Browser**
    Setelah semua langkah selesai, Anda dapat langsung mengakses modul aplikasi di browser melalui URL berikut:
    * **Halaman Depan Pelanggan (Menu Digital)**: [http://localhost/pemesanan.aksara/public/](http://localhost/pemesanan.aksara/public/)
    * **Halaman Login POS (Kasir/Admin/Owner)**: [http://localhost/pemesanan.aksara/public/login](http://localhost/pemesanan.aksara/public/login)
@@ -125,8 +134,7 @@ Dengan struktur ini, modul dapat ditambahkan, dihapus, atau dimodifikasi tanpa m
 Beberapa modul pada sistem saat ini masih berupa mockup (menggunakan simulasi data lokal browser `localStorage` atau alert visual) dan memerlukan pengembangan lebih lanjut untuk diintegrasikan secara penuh ke database backend:
 
 1. **Modul Pengaturan & Printer**: Integrasi riil cetak struk kasir melalui koneksi printer thermal Bluetooth/USB (saat ini hanya berupa alert simulasi).
-2. **Modul Pengeluaran Operasional**: Penyimpanan data pengeluaran kas operasional ke database MySQL.
-3. **Modul Inventory & Bahan Baku**: Penyimpanan resep produk, konsumsi stok bahan baku otomatis saat checkout, serta manajemen PO (Purchase Order) bahan baku ke supplier.
-4. **Modul Pelanggan & Konsinyasi**: Pencatatan data pelanggan grosir, loyalitas poin, dan penitipan produk pastri pihak ketiga secara permanen.
-5. **Mode Industri Non-FnB**: Implementasi modul retail, laundry, salon, dan bengkel secara penuh di sisi database (saat ini data transaksi mode non-fnb disimpan sementara di memori browser `localStorage` kasir).
-6. **Payment Gateway QRIS**: Koneksi API pembayaran QRIS dinamis & otomatis dengan sistem webhooks/payment gateway pihak ketiga untuk memverifikasi pembayaran secara real-time tanpa tombol manual.
+2. **Modul Inventory Lanjutan (Resep & Otomasi)**: Penyimpanan resep produk, konsumsi otomatis stok bahan baku saat checkout pesanan, serta manajemen PO (Purchase Order) bahan baku ke supplier.
+3. **Modul Pelanggan & Konsinyasi**: Pencatatan data pelanggan grosir, loyalitas poin, dan penitipan produk pastri pihak ketiga secara permanen.
+4. **Mode Industri Non-FnB**: Implementasi modul retail, laundry, salon, dan bengkel secara penuh di sisi database (saat ini data transaksi mode non-fnb disimpan sementara di memori browser `localStorage` kasir).
+5. **Payment Gateway QRIS**: Koneksi API pembayaran QRIS dinamis & otomatis dengan sistem webhooks/payment gateway pihak ketiga untuk memverifikasi pembayaran secara real-time tanpa tombol manual.
